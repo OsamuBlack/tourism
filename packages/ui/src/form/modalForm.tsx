@@ -64,41 +64,48 @@ export function ModalForm<T>({
             >
               <Box
                 sx={{
-                  bgcolor: (props) => props.palette.primary.main,
-                  color: (props) => props.palette.primary.contrastText,
-                  p: 2,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  maxHeight: "90vh",
+                  overflowY: "auto",
                 }}
               >
-                <Typography variant="h5" component="p">
-                  {title}
-                </Typography>
-                <IconButton color={"inherit"} onClick={() => setOpen(false)}>
-                  <Close />
-                </IconButton>
-              </Box>
-              <Box
-                component={"form"}
-                sx={{
-                  p: 2,
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 4,
-                }}
-                onSubmit={formik.handleSubmit}
-              >
-                {fields(formik)}
-                <Button
-                  disabled={!formik.isValid}
-                  color="primary"
-                  variant="contained"
-                  fullWidth
-                  type="submit"
+                <Box
+                  sx={{
+                    bgcolor: (props) => props.palette.primary.main,
+                    color: (props) => props.palette.primary.contrastText,
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  {submitText || "Submit"}
-                </Button>
+                  <Typography variant="h5" component="p">
+                    {title}
+                  </Typography>
+                  <IconButton color={"inherit"} onClick={() => setOpen(false)}>
+                    <Close />
+                  </IconButton>
+                </Box>
+                <Box
+                  component={"form"}
+                  sx={{
+                    p: 2,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 4,
+                  }}
+                  onSubmit={formik.handleSubmit}
+                >
+                  {fields(formik)}
+                  <Button
+                    disabled={!formik.isValid}
+                    color="primary"
+                    variant="contained"
+                    fullWidth
+                    type="submit"
+                  >
+                    {submitText || "Submit"}
+                  </Button>
+                </Box>
               </Box>
             </Box>
           </Container>

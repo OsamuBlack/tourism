@@ -2,7 +2,7 @@ import Layout from "@repo/ui/dashboardLayout";
 import { Button } from "@repo/ui/button";
 import { ListItem } from "@repo/ui/listItem";
 import Link from "next/link";
-import { MdHome, MdPerson } from "react-icons/md";
+import { MdHome, MdPerson, MdLocationPin } from "react-icons/md";
 
 export default function RootLayout({
   children,
@@ -36,6 +36,24 @@ export default function RootLayout({
                 />
               }
               primary="Dashboard"
+            />
+          </Link>
+          <Link
+            href="/sites"
+            style={{
+              textDecoration: "none",
+              color: "inherit",
+            }}
+          >
+            <ListItem
+              icon={
+                <MdLocationPin
+                  style={{
+                    fontSize: "1.5rem",
+                  }}
+                />
+              }
+              primary="Sites"
             />
           </Link>
           <Link

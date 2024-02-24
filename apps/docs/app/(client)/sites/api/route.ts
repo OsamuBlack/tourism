@@ -1,67 +1,54 @@
 // import { getServerSession } from "next-auth";
 import { NextRequest, NextResponse } from "next/server";
-import { userType } from "@repo/modal/types";
-import bcrypt from "bcryptjs";
-import { getUsers, addUser, updateUser, deleteUser } from "@repo/modal/models";
+import { siteType } from "@repo/modal/types";
+import { getSites, addSite, updateSite, deleteSite } from "@repo/modal/models";
 
 export async function GET(request: NextRequest) {
-  // const token = request.nextUrl.searchParams.get("token");
-
-  let users;
-  // const session = await getServerSession(authOptions);
-  // if (session) {
+  let sites;
   try {
-    users = await getUsers();
+    sites = await getSites();
     return NextResponse.json({
-      users: users,
+      sites: sites,
       status: 200,
     });
   } catch (e) {
     console.log("Error", e);
     return NextResponse.json({
-      users: null,
+      sites: null,
       status: 500,
     });
   }
-  // }
-  // else {
-  //   return NextResponse.json({
-  //     users: null,
-  //     status: 401,
-  //   });
-  // }
 }
 
 export async function POST(request: NextRequest) {
-  let payload: userType = await request.json();
-  const password = await bcrypt.hash("000000", 10);
+  let payload: siteType = await request.json();
 
   try {
-    addUser(payload, password);
+    addSite(payload);
     return NextResponse.json({
       status: 200,
     });
   } catch (e) {
     console.log("Error", e);
     return NextResponse.json({
-      users: null,
+      sites: null,
       status: 500,
     });
   }
 }
 
 export async function PUT(request: NextRequest) {
-  let payload: userType = await request.json();
+  let payload: siteType = await request.json();
 
   try {
-    updateUser(payload);
+    updateSite(payload);
     return NextResponse.json({
       status: 200,
     });
   } catch (e) {
     console.log("Error", e);
     return NextResponse.json({
-      users: null,
+      sites: null,
       status: 500,
     });
   }
@@ -71,14 +58,14 @@ export async function DELETE(request: NextRequest) {
   let id: string = await request.json();
 
   try {
-    deleteUser(id);
+    deleteSite(id);
     return NextResponse.json({
       status: 200,
     });
   } catch (e) {
     console.log("Error", e);
     return NextResponse.json({
-      users: null,
+      sites: null,
       status: 500,
     });
   }

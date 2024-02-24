@@ -2,9 +2,8 @@ import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import bcrypt from "bcryptjs";
-import { db } from "./database";
-import * as schema from "./schema";
-
+import { db } from "@repo/modal/db";
+import { addUser } from "@repo/modal/userModel";
 const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",
@@ -43,20 +42,12 @@ const authOptions: AuthOptions = {
 
             if (valid && user.role == "admin") return user;
             return null;
-          } else {
+          } else if (user) {
             const password = await bcrypt.hash(credentials.password, 10);
-            await db
-              .insert(schema.users)
-              .values({
-                email: credentials.email,
-                password: password,
-              })
-              .returning()
-              .then((user) => {
-                console.log(user);
-              });
+            const res = addUser(user, password);
             return null;
           }
+          return null;
         }
       },
     }),
