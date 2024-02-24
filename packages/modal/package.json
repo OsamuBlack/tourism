@@ -1,6 +1,6 @@
 {
   "name": "@repo/modal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "exports": {
     "./schema": "./src/schema.ts",
@@ -13,8 +13,8 @@
     "generate:component": "turbo gen react-component"
   },
   "devDependencies": {
-    "@repo/eslint-config": "^0.1.0",
-    "@repo/typescript-config": "^0.1.0",
+    "@repo/eslint-config": "^0.2.0",
+    "@repo/typescript-config": "^0.2.0",
     "@turbo/gen": "^1.11.3",
     "@types/bcryptjs": "^2.4.6",
     "@types/eslint": "^8.56.1",
