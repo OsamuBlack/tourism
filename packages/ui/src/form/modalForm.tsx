@@ -64,48 +64,49 @@ export function ModalForm<T>({
             >
               <Box
                 sx={{
+                  bgcolor: (props) => props.palette.primary.main,
+                  color: (props) => props.palette.primary.contrastText,
+                  p: 2,
+
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
+              >
+                <Typography variant="h5" component="p">
+                  {title}
+                </Typography>
+                <IconButton color={"inherit"} onClick={() => setOpen(false)}>
+                  <Close />
+                </IconButton>
+              </Box>
+              <Box
+                component={"form"}
+                sx={{
+                  p: 2,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
                   maxHeight: "90vh",
                   overflowY: "auto",
                 }}
+                onSubmit={formik.handleSubmit}
               >
-                <Box
-                  sx={{
-                    bgcolor: (props) => props.palette.primary.main,
-                    color: (props) => props.palette.primary.contrastText,
-                    p: 2,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
+                {fields(formik)}
+                {!formik.isValid && Boolean(formik.submitCount) && (
+                  <FormHelperText error>
+                    Remove all errors to continue
+                  </FormHelperText>
+                )}
+                <Button
+                  disabled={!formik.isValid && Boolean(formik.submitCount)}
+                  color="primary"
+                  variant="contained"
+                  fullWidth
+                  type="submit"
                 >
-                  <Typography variant="h5" component="p">
-                    {title}
-                  </Typography>
-                  <IconButton color={"inherit"} onClick={() => setOpen(false)}>
-                    <Close />
-                  </IconButton>
-                </Box>
-                <Box
-                  component={"form"}
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 4,
-                  }}
-                  onSubmit={formik.handleSubmit}
-                >
-                  {fields(formik)}
-                  <Button
-                    disabled={!formik.isValid}
-                    color="primary"
-                    variant="contained"
-                    fullWidth
-                    type="submit"
-                  >
-                    {submitText || "Submit"}
-                  </Button>
-                </Box>
+                  {submitText || "Submit"}
+                </Button>
               </Box>
             </Box>
           </Container>
@@ -142,7 +143,7 @@ export function ModalConfirm<T>({
           width={"100%"}
           height={"100%"}
         >
-          <Container maxWidth={"sm"}>
+          <Container maxWidth={"md"}>
             <Box
               sx={{
                 borderRadius: 4,

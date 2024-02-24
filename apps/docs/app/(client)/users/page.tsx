@@ -7,6 +7,7 @@ import { TextField, MenuItem } from "@repo/ui/fields";
 import { ModalForm, yup, ModalConfirm } from "@repo/ui/form";
 import { userType } from "./types";
 import { v4 } from "uuid";
+import { getUsers, addUser, updateUser, deleteUser } from "./request";
 
 const userSchema = yup.object({
   id: yup.string().required(),
@@ -80,33 +81,6 @@ export default function UsersPage() {
   const [open, setOpen] = useState(false);
   const [user, setUser] = useState<userType | null>();
   const [deleteId, setDeleteId] = useState<string | null>();
-
-  const getUsers = async () => {
-    const res = await fetch("/users/api");
-    const data = await res.json();
-    return data.users;
-  };
-
-  const addUser = async (values: object) => {
-    return await fetch("/users/api", {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
-  };
-
-  const updateUser = async (values: object) => {
-    return await fetch("/users/api", {
-      method: "PUT",
-      body: JSON.stringify(values),
-    });
-  };
-
-  const deleteUser = async (id: string) => {
-    return await fetch("/users/api", {
-      method: "DELETE",
-      body: JSON.stringify(id),
-    });
-  };
 
   useEffect(() => {
     if (loading)

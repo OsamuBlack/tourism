@@ -3,25 +3,26 @@
 import { useEffect, useState } from "react";
 
 import { TableGrid } from "@repo/ui/table";
-import { TextField, MDEditor, MapPicker } from "@repo/ui/fields";
+import { TextField, MDEditor } from "@repo/ui/fields";
 import { ModalForm, yup, ModalConfirm } from "@repo/ui/form";
 import { FormHelperText, InputLabel } from "@repo/ui/typography";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
-import { siteType } from "@repo/modal/types";
+import { transportType } from "@repo/modal/types";
 import { v4 } from "uuid";
+import {
+  addTransport,
+  getTransports,
+  updateTransport,
+  deleteTransport,
+} from "./request";
 
-import { addSite, getSites, deleteSite, updateSite } from "./request";
-
-const siteSchema = yup.object<siteType>({
+const transportSchema = yup.object<transportType>({
   id: yup.string().required(),
   name: yup.string().required(),
   urduName: yup.string(),
   heroImage: yup.string().url(),
-  longitude: yup.string().required(),
-  latitude: yup.string().required(),
-  zoom: yup.string().required(),
-  address: yup.string().required(),
+  capacity: yup.string().required().min(1),
   description: yup.string().required(),
   urduDescription: yup.string(),
 });
@@ -34,7 +35,7 @@ function Fields({ formik }: { formik: any }) {
         id="id"
         name="id"
         disabled
-        label="Id *"
+        label="Id"
         value={formik.values.id}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
@@ -48,7 +49,7 @@ function Fields({ formik }: { formik: any }) {
         fullWidth
         id="name"
         name="name"
-        label="Name *"
+        label="Name"
         value={formik.values.name}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
@@ -78,41 +79,25 @@ function Fields({ formik }: { formik: any }) {
         onBlur={formik.handleBlur}
         error={formik.touched.heroImage && Boolean(formik.errors.heroImage)}
         helperText={
-          ((formik.touched.heroImage && formik.errors.heroImage) as string) ||
-          "Enter url of the image"
+          (formik.touched.heroImage && formik.errors.heroImage) as string
         }
       />
-      <div className="">
-        <InputLabel>Location *</InputLabel>
-        <MapPicker
-          latitude={formik.values.latitude}
-          setLatitude={(value: number) =>
-            formik.setFieldValue("latitude", value)
-          }
-          longitude={formik.values.longitude}
-          setLongitude={(value: number) =>
-            formik.setFieldValue("longitude", value)
-          }
-          zoom={formik.values.zoom}
-          setZoom={(value: number) => formik.setFieldValue("zoom", value)}
-        />
-        <FormHelperText error>
-          {(formik.touched.zoom && formik.errors.zoom) as string}
-        </FormHelperText>
-      </div>
       <TextField
         fullWidth
-        id="address"
-        name="address"
-        label="Address *"
-        value={formik.values.address}
+        id="capacity"
+        name="capacity"
+        type="number"
+        label="Capacity"
+        value={formik.values.capacity}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        error={formik.touched.address && Boolean(formik.errors.address)}
-        helperText={(formik.touched.address && formik.errors.address) as string}
+        error={formik.touched.capacity && Boolean(formik.errors.capacity)}
+        helperText={
+          (formik.touched.capacity && formik.errors.capacity) as string
+        }
       ></TextField>
       <div data-color-mode="light">
-        <InputLabel>Description *</InputLabel>
+        <InputLabel>Description</InputLabel>
         <MDEditor
           id="description"
           value={formik.values.description}
@@ -147,38 +132,39 @@ function Fields({ formik }: { formik: any }) {
   );
 }
 
-export default function SitesPage() {
-  const [sites, setSites] = useState<siteType[]>([]);
+export default function TransportsPage() {
+  const [transports, setTransports] = useState<transportType[]>([]);
 
   const [request, setRequest] = useState(0);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [site, setSite] = useState<siteType | null>();
+  const [transport, setTransport] = useState<transportType | null>();
   const [deleteId, setDeleteId] = useState<string | null>();
 
   useEffect(() => {
     if (loading)
-      getSites().then((newSites) => {
-        if (newSites) setSites((prevSites) => [...prevSites, ...newSites]);
+      getTransports().then((newTransports) => {
+        if (newTransports)
+          setTransports((prevTransports) => [
+            ...prevTransports,
+            ...newTransports,
+          ]);
         if (request == 0 && loading) setLoading(false);
       });
   }, [request]);
   return (
     <>
       <TableGrid
-        data={sites}
+        data={transports}
         baseColumns={[
           { field: "id", headerName: "ID", width: 70 },
           { field: "name", headerName: "Name", width: 200 },
-          { field: "longitude", headerName: "Longitude", width: 75 },
-          { field: "latitude", headerName: "Latitude", width: 75 },
-          { field: "zoom", headerName: "Zoom", width: 75 },
-          { field: "address", headerName: "Address", width: 200 },
-          { field: "description", headerName: "Description", width: 200 },
+          { field: "capacity", headerName: "Capacity", width: 75 },
+          { field: "description", headerName: "Description", width: 300 },
         ]}
         loading={loading}
         updateRow={async (row) => {
-          setSite(row as siteType);
+          setTransport(row as transportType);
         }}
         deleteRow={(row) => {
           setDeleteId(row.id);
@@ -187,70 +173,77 @@ export default function SitesPage() {
       />
       {open && (
         <ModalForm
-          title={"Add New Site"}
-          schema={siteSchema}
+          title={"Add New Transport"}
+          schema={transportSchema}
           initialValues={{
             id: v4(),
-            latitude: 30,
-            longitude: 69,
-            zoom: 6,
+            name: "",
+            email: "",
+            role: "transport",
           }}
           fields={(formik) => <Fields formik={formik} />}
           onSubmit={async (values) => {
-            const res = await addSite(values);
+            const res = await addTransport(values);
             if (res.status == 200) {
-              setSites((prevSites) => [values as siteType, ...prevSites]);
+              setTransports((prevTransports) => [
+                values as transportType,
+                ...prevTransports,
+              ]);
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully created a new site"
-              : "Error creating the site";
+              ? "Successfully created a new transport"
+              : "Error creating the transport";
           }}
           open={open}
           setOpen={setOpen}
-          submitText="Add Site"
+          submitText="Add Transport"
         />
       )}
-      {site && (
+      {transport && (
         <ModalForm
-          title={"Update Site"}
-          schema={siteSchema}
-          initialValues={site}
+          title={"Update Transport"}
+          schema={transportSchema}
+          initialValues={transport}
           fields={(formik) => <Fields formik={formik} />}
           onSubmit={async (values) => {
-            const res = await updateSite(values);
-            const updatedSite = values as siteType;
+            const res = await updateTransport(values);
+            const updatedTransport = values as transportType;
             if (res.status == 200) {
-              setSites((prevRows) =>
-                prevRows?.map((r) => (r.id == updatedSite.id ? updatedSite : r))
+              setTransports((prevRows) =>
+                prevRows?.map((r) =>
+                  r.id == updatedTransport.id ? updatedTransport : r
+                )
               );
             }
             return res.status == 200
-              ? "Successfully updated the site"
-              : "Error updating the site";
+              ? "Successfully updated the transport"
+              : "Error updating the transport";
           }}
           open={true}
-          setOpen={() => setSite(null)}
-          submitText="Update Site"
+          setOpen={() => setTransport(null)}
+          submitText="Update Transport"
         />
       )}
       {deleteId && (
         <ModalConfirm
-          title="Delete Site"
+          title="Delete Transport"
           open={true}
           setOpen={() => setDeleteId(null)}
           onSubmit={async () => {
-            const res = await deleteSite(deleteId);
+            const res = await deleteTransport(deleteId);
             if (res.status == 200) {
-              setSites((prevRows) => prevRows?.filter((r) => r.id != deleteId));
+              setTransports((prevRows) =>
+                prevRows?.filter((r) => r.id != deleteId)
+              );
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully deleted the site"
-              : "Error deleted the site";
+              ? "Successfully deleted the transport"
+              : "Error deleted the transport";
           }}
         >
-          Are you sure you want to delete this site?
+          Are you sure you want to delete this transport?
         </ModalConfirm>
       )}
     </>

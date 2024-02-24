@@ -3,7 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 
 import bcrypt from "bcryptjs";
 import { db } from "@repo/modal/db";
-import { addUser } from "@repo/modal/userModel";
+import { addUser } from "@repo/modal/models";
 const authOptions: AuthOptions = {
   session: {
     strategy: "jwt",

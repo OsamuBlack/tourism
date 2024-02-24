@@ -1,6 +1,6 @@
 import { defineConfig } from "drizzle-kit";
 export default defineConfig({
-  schema: "./schema.ts",
+  schema: "./src/schema.ts",
   driver: "pg",
   dbCredentials: {
     connectionString: process.env.DB_URL || "",
