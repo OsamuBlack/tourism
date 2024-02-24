@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev --port 3001",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.7.0",
-    "@repo/ui": "*",
+    "@repo/ui": "^0.1.0",
     "bcryptjs": "^2.4.3",
     "drizzle-orm": "^0.29.4",
     "next": "^14.0.4",
@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^14.0.4",
-    "@repo/eslint-config": "*",
-    "@repo/typescript-config": "*",
+    "@repo/eslint-config": "^0.1.0",
+    "@repo/typescript-config": "^0.1.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/eslint": "^8.56.1",
     "@types/node": "^20.10.6",
