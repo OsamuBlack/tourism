@@ -36,7 +36,7 @@ export default function RootLayout({
             href="/"
             style={{
               textDecoration: "none",
-              color: pathname == "/" ? undefined : "inherit",
+              color: pathname == "/" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -54,7 +54,7 @@ export default function RootLayout({
             href="/sites"
             style={{
               textDecoration: "none",
-              color: pathname == "/sites" ? undefined : "inherit",
+              color: pathname == "/sites" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -72,7 +72,7 @@ export default function RootLayout({
             href="/transports"
             style={{
               textDecoration: "none",
-              color: pathname == "/transports" ? undefined : "inherit",
+              color: pathname == "/transports" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -90,7 +90,7 @@ export default function RootLayout({
             href="/tours"
             style={{
               textDecoration: "none",
-              color: pathname == "/tours" ? undefined : "inherit",
+              color: pathname == "/tours" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -108,7 +108,7 @@ export default function RootLayout({
             href="/bookings"
             style={{
               textDecoration: "none",
-              color: pathname == "/bookings" ? undefined : "inherit",
+              color: pathname == "/bookings" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -126,7 +126,7 @@ export default function RootLayout({
             href="/queries"
             style={{
               textDecoration: "none",
-              color: pathname == "/queries" ? undefined : "inherit",
+              color: pathname == "/queries" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -144,7 +144,7 @@ export default function RootLayout({
             href="/reviews"
             style={{
               textDecoration: "none",
-              color: pathname == "/reviews" ? undefined : "inherit",
+              color: pathname == "/reviews" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem
@@ -162,7 +162,7 @@ export default function RootLayout({
             href="/users"
             style={{
               textDecoration: "none",
-              color: pathname == "/users" ? undefined : "inherit",
+              color: pathname == "/users" ? "#FF7757" : "inherit",
             }}
           >
             <ListItem

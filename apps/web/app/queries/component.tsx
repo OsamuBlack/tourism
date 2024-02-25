@@ -5,28 +5,19 @@ import { useEffect, useState } from "react";
 import { TableGrid } from "@repo/ui/table";
 import { TextField, MenuItem } from "@repo/ui/fields";
 import { ModalForm, yup, ModalConfirm } from "@repo/ui/form";
-import { reviewType, tourType, userType } from "@repo/modal/types";
+import { queryType, userType } from "@repo/modal/types";
 import { v4 } from "uuid";
 import { getUsers } from "../users/request";
-import { getTours } from "../tours/request";
-import { getReviews, addReview, deleteReview, updateReview } from "./requests";
 
-const reviewSchema = yup.object<reviewType>({
+import { getQuerys, addQuery, updateQuery, deleteQuery } from "./requests";
+
+const querySchema = yup.object<queryType>({
   id: yup.string().required(),
-  tourId: yup.string().required(),
-  content: yup.string().required(),
-  ratting: yup.number().min(0).max(5),
+  userId: yup.string().required(),
+  query: yup.string().required(),
 });
 
-function Fields({
-  formik,
-  tour,
-  users,
-}: {
-  formik: any;
-  tour: tourType[];
-  users: userType[];
-}) {
+function Fields({ formik, users }: { formik: any; users: userType[] }) {
   return (
     <>
       <TextField
@@ -48,7 +39,7 @@ function Fields({
         fullWidth
         id="userId"
         name="userId"
-        label="User*"
+        label="User"
         select
         value={formik.values.userId}
         onChange={formik.handleChange}
@@ -64,73 +55,52 @@ function Fields({
       </TextField>
       <TextField
         fullWidth
-        id="tourId"
-        name="tourId"
-        label="Tour*"
-        select
-        value={formik.values.tourId}
+        id="query"
+        name="query"
+        label="Query"
+        value={formik.values.query}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        error={formik.touched.tourId && Boolean(formik.errors.tourId)}
-        helperText={(formik.touched.tourId && formik.errors.tourId) as string}
-      >
-        {tour.map((item) => (
-          <MenuItem value={item.id} key={item.id}>
-            {item.name}
-          </MenuItem>
-        ))}
-      </TextField>
-      <TextField
-        fullWidth
-        id="content"
-        name="content"
-        label="Review*"
-        value={formik.values.content}
-        onChange={formik.handleChange}
-        onBlur={formik.handleBlur}
-        error={formik.touched.content && Boolean(formik.errors.content)}
-        helperText={(formik.touched.content && formik.errors.content) as string}
+        error={formik.touched.query && Boolean(formik.errors.query)}
+        helperText={(formik.touched.query && formik.errors.query) as string}
       />
     </>
   );
 }
 
-export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<reviewType[]>([]);
+export default function QuerysPage() {
+  const [querys, setQuerys] = useState<queryType[]>([]);
 
   const [request, setRequest] = useState(0);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [review, setReview] = useState<reviewType | null>();
+  const [query, setQuery] = useState<queryType | null>();
   const [deleteId, setDeleteId] = useState<string | null>();
-  const [tour, setTours] = useState<tourType[]>([]);
-  const [users, setUsers] = useState<userType[]>([]);
 
+  const [users, setUsers] = useState<userType[]>([]);
   useEffect(() => {
-    getTours().then((t) => setTours(t));
     getUsers().then((usrs: userType[]) => setUsers(usrs));
   }, []);
 
   useEffect(() => {
     if (loading)
-      getReviews().then((newReviews) => {
-        if (newReviews)
-          setReviews((prevReviews) => [...prevReviews, ...newReviews]);
+      getQuerys().then((newQuerys) => {
+        if (newQuerys) setQuerys((prevQuerys) => [...prevQuerys, ...newQuerys]);
         if (request == 0 && loading) setLoading(false);
       });
   }, [request]);
   return (
     <>
       <TableGrid
-        data={reviews}
+        data={querys}
         baseColumns={[
           { field: "id", headerName: "ID", width: 70 },
           { field: "userId", headerName: "User", width: 75 },
-          { field: "content", headerName: "Review", width: 200 },
+          { field: "query", headerName: "Query", width: 200 },
         ]}
         loading={loading}
         updateRow={async (row) => {
-          setReview(row as reviewType);
+          setQuery(row as queryType);
         }}
         deleteRow={(row) => {
           setDeleteId(row.id);
@@ -139,78 +109,71 @@ export default function ReviewsPage() {
       />
       {open && (
         <ModalForm
-          title={"Add New Review"}
-          schema={reviewSchema}
+          title={"Add New Query"}
+          schema={querySchema}
           initialValues={{
             id: v4(),
           }}
-          fields={(formik) => (
-            <Fields formik={formik} users={users} tour={tour} />
-          )}
+          fields={(formik) => <Fields formik={formik} users={users} />}
           onSubmit={async (values) => {
-            const res = await addReview(values);
+            const res = await addQuery(values);
             if (res.status == 200) {
-              setReviews((prevReviews) => [
-                values as reviewType,
-                ...prevReviews,
-              ]);
+              setQuerys((prevQuerys) => [values as queryType, ...prevQuerys]);
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully created a new review"
-              : "Error creating the review";
+              ? "Successfully created a new query"
+              : "Error creating the query";
           }}
           open={open}
           setOpen={setOpen}
-          submitText="Add Review"
+          submitText="Add Query"
         />
       )}
-      {review && (
+      {query && (
         <ModalForm
-          title={"Update Review"}
-          schema={reviewSchema}
-          initialValues={review}
-          fields={(formik) => (
-            <Fields formik={formik} users={users} tour={tour} />
-          )}
+          title={"Update Query"}
+          schema={querySchema}
+          initialValues={query}
+          fields={(formik) => <Fields formik={formik} users={users} />}
           onSubmit={async (values) => {
-            const res = await updateReview(values);
-            const updatedReview = values as reviewType;
+            const res = await updateQuery(values);
+            const updatedQuery = values as queryType;
             if (res.status == 200) {
-              setReviews((prevRows) =>
+              setQuerys((prevRows) =>
                 prevRows?.map((r) =>
-                  r.id == updatedReview.id ? updatedReview : r
+                  r.id == updatedQuery.id ? updatedQuery : r
                 )
               );
             }
             return res.status == 200
-              ? "Successfully updated the review"
-              : "Error updating the review";
+              ? "Successfully updated the query"
+              : "Error updating the query";
           }}
           open={true}
-          setOpen={() => setReview(null)}
-          submitText="Update Review"
+          setOpen={() => setQuery(null)}
+          submitText="Update Query"
         />
       )}
       {deleteId && (
         <ModalConfirm
-          title="Delete Review"
+          title="Delete Query"
           open={true}
           setOpen={() => setDeleteId(null)}
           onSubmit={async () => {
-            const res = await deleteReview(deleteId);
+            const res = await deleteQuery(deleteId);
             if (res.status == 200) {
-              setReviews((prevRows) =>
+              setQuerys((prevRows) =>
                 prevRows?.filter((r) => r.id != deleteId)
               );
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully deleted the review"
-              : "Error deleted the review";
+              ? "Successfully deleted the query"
+              : "Error deleted the query";
           }}
         >
-          Are you sure you want to delete this review?
+          Are you sure you want to delete this query?
         </ModalConfirm>
       )}
     </>

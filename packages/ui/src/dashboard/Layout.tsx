@@ -15,6 +15,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import React, { useState } from "react";
 import { Container } from "@mui/material";
+import { MuiTheme } from "../theme";
 
 function Copyright(props: any) {
   return (
@@ -84,9 +85,6 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-// TODO remove, this demo shouldn't need to reset the theme.
-const defaultTheme = createTheme();
-
 export default function Layout({
   children,
   headerActions,
@@ -102,7 +100,7 @@ export default function Layout({
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={MuiTheme}>
       <Box sx={{ display: "flex" }}>
         <CssBaseline />
         <AppBar position="absolute" open={open}>
@@ -126,11 +124,11 @@ export default function Layout({
             <Typography
               component="h1"
               variant="h6"
-              color="inherit"
+              color="#fff"
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              Dashboard
+              Sole
             </Typography>
             {headerActions}
           </Toolbar>

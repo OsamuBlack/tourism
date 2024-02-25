@@ -12,6 +12,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { MuiTheme } from './theme';
 
 function Copyright(props: any) {
   return (
@@ -40,7 +41,7 @@ export default function SignUp() {
   };
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={MuiTheme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box

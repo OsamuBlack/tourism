@@ -13,6 +13,7 @@ import { SignInResponse } from "next-auth/react";
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { MuiTheme } from "./theme";
 
 function Copyright(props: any) {
   return (
@@ -71,7 +72,7 @@ export default function SignInSide({
   });
 
   return (
-    <ThemeProvider theme={defaultTheme}>
+    <ThemeProvider theme={MuiTheme}>
       <Grid container component="main" sx={{ height: "100vh" }}>
         <CssBaseline />
         <Grid

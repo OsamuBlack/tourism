@@ -5,27 +5,34 @@ import { useEffect, useState } from "react";
 import { TableGrid } from "@repo/ui/table";
 import { TextField, MenuItem } from "@repo/ui/fields";
 import { ModalForm, yup, ModalConfirm } from "@repo/ui/form";
-import { reviewType, tourType, userType } from "@repo/modal/types";
+import { bookingType, tourType, userType } from "@repo/modal/types";
 import { v4 } from "uuid";
 import { getUsers } from "../users/request";
 import { getTours } from "../tours/request";
-import { getReviews, addReview, deleteReview, updateReview } from "./requests";
 
-const reviewSchema = yup.object<reviewType>({
+import {
+  getBookings,
+  addBooking,
+  updateBooking,
+  deleteBooking,
+} from "./requests";
+
+const bookingSchema = yup.object<bookingType>({
   id: yup.string().required(),
+  transportId: yup.string(),
+  status: yup.string(),
   tourId: yup.string().required(),
-  content: yup.string().required(),
-  ratting: yup.number().min(0).max(5),
+  userId: yup.string().required(),
 });
 
 function Fields({
   formik,
-  tour,
   users,
+  tours,
 }: {
   formik: any;
-  tour: tourType[];
   users: userType[];
+  tours: tourType[];
 }) {
   return (
     <>
@@ -48,7 +55,7 @@ function Fields({
         fullWidth
         id="userId"
         name="userId"
-        label="User*"
+        label="User"
         select
         value={formik.values.userId}
         onChange={formik.handleChange}
@@ -66,7 +73,7 @@ function Fields({
         fullWidth
         id="tourId"
         name="tourId"
-        label="Tour*"
+        label="Tour"
         select
         value={formik.values.tourId}
         onChange={formik.handleChange}
@@ -74,7 +81,7 @@ function Fields({
         error={formik.touched.tourId && Boolean(formik.errors.tourId)}
         helperText={(formik.touched.tourId && formik.errors.tourId) as string}
       >
-        {tour.map((item) => (
+        {tours.map((item) => (
           <MenuItem value={item.id} key={item.id}>
             {item.name}
           </MenuItem>
@@ -82,55 +89,62 @@ function Fields({
       </TextField>
       <TextField
         fullWidth
-        id="content"
-        name="content"
-        label="Review*"
-        value={formik.values.content}
+        id="status"
+        name="status"
+        label="Status"
+        select
+        value={formik.values.status}
         onChange={formik.handleChange}
         onBlur={formik.handleBlur}
-        error={formik.touched.content && Boolean(formik.errors.content)}
-        helperText={(formik.touched.content && formik.errors.content) as string}
-      />
+        error={formik.touched.status && Boolean(formik.errors.status)}
+        helperText={(formik.touched.status && formik.errors.status) as string}
+      >
+        <MenuItem value={"pending"}>Payment Pending</MenuItem>
+        <MenuItem value={"confirmed"}>Confirmed</MenuItem>
+        <MenuItem value={"completed"}>Completed</MenuItem>
+        <MenuItem value={"canceled"}>Cancled</MenuItem>
+      </TextField>
     </>
   );
 }
 
-export default function ReviewsPage() {
-  const [reviews, setReviews] = useState<reviewType[]>([]);
+export default function BookingsPage() {
+  const [bookings, setBookings] = useState<bookingType[]>([]);
 
   const [request, setRequest] = useState(0);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
-  const [review, setReview] = useState<reviewType | null>();
+  const [booking, setBooking] = useState<bookingType | null>();
   const [deleteId, setDeleteId] = useState<string | null>();
-  const [tour, setTours] = useState<tourType[]>([]);
+
   const [users, setUsers] = useState<userType[]>([]);
-
+  const [tours, setTours] = useState<tourType[]>([]);
   useEffect(() => {
-    getTours().then((t) => setTours(t));
     getUsers().then((usrs: userType[]) => setUsers(usrs));
-  }, []);
-
+    getTours().then((items: tourType[]) => setTours(items));
+  }, [])
+  
   useEffect(() => {
     if (loading)
-      getReviews().then((newReviews) => {
-        if (newReviews)
-          setReviews((prevReviews) => [...prevReviews, ...newReviews]);
+      getBookings().then((newBookings) => {
+        if (newBookings)
+          setBookings((prevBookings) => [...prevBookings, ...newBookings]);
         if (request == 0 && loading) setLoading(false);
       });
   }, [request]);
   return (
     <>
       <TableGrid
-        data={reviews}
+        data={bookings}
         baseColumns={[
           { field: "id", headerName: "ID", width: 70 },
-          { field: "userId", headerName: "User", width: 75 },
-          { field: "content", headerName: "Review", width: 200 },
+          { field: "status", headerName: "Status", width: 200 },
+          { field: "userId", headerName: "User", width: 200 },
+          { field: "tourId", headerName: "Tour", width: 200 },
         ]}
         loading={loading}
         updateRow={async (row) => {
-          setReview(row as reviewType);
+          setBooking(row as bookingType);
         }}
         deleteRow={(row) => {
           setDeleteId(row.id);
@@ -139,78 +153,78 @@ export default function ReviewsPage() {
       />
       {open && (
         <ModalForm
-          title={"Add New Review"}
-          schema={reviewSchema}
+          title={"Add New Booking"}
+          schema={bookingSchema}
           initialValues={{
             id: v4(),
           }}
           fields={(formik) => (
-            <Fields formik={formik} users={users} tour={tour} />
+            <Fields formik={formik} tours={tours} users={users} />
           )}
           onSubmit={async (values) => {
-            const res = await addReview(values);
+            const res = await addBooking(values);
             if (res.status == 200) {
-              setReviews((prevReviews) => [
-                values as reviewType,
-                ...prevReviews,
+              setBookings((prevBookings) => [
+                values as bookingType,
+                ...prevBookings,
               ]);
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully created a new review"
-              : "Error creating the review";
+              ? "Successfully created a new booking"
+              : "Error creating the booking";
           }}
           open={open}
           setOpen={setOpen}
-          submitText="Add Review"
+          submitText="Add Booking"
         />
       )}
-      {review && (
+      {booking && (
         <ModalForm
-          title={"Update Review"}
-          schema={reviewSchema}
-          initialValues={review}
+          title={"Update Booking"}
+          schema={bookingSchema}
+          initialValues={booking}
           fields={(formik) => (
-            <Fields formik={formik} users={users} tour={tour} />
+            <Fields formik={formik} tours={tours} users={users} />
           )}
           onSubmit={async (values) => {
-            const res = await updateReview(values);
-            const updatedReview = values as reviewType;
+            const res = await updateBooking(values);
+            const updatedBooking = values as bookingType;
             if (res.status == 200) {
-              setReviews((prevRows) =>
+              setBookings((prevRows) =>
                 prevRows?.map((r) =>
-                  r.id == updatedReview.id ? updatedReview : r
+                  r.id == updatedBooking.id ? updatedBooking : r
                 )
               );
             }
             return res.status == 200
-              ? "Successfully updated the review"
-              : "Error updating the review";
+              ? "Successfully updated the booking"
+              : "Error updating the booking";
           }}
           open={true}
-          setOpen={() => setReview(null)}
-          submitText="Update Review"
+          setOpen={() => setBooking(null)}
+          submitText="Update Booking"
         />
       )}
       {deleteId && (
         <ModalConfirm
-          title="Delete Review"
+          title="Delete Booking"
           open={true}
           setOpen={() => setDeleteId(null)}
           onSubmit={async () => {
-            const res = await deleteReview(deleteId);
+            const res = await deleteBooking(deleteId);
             if (res.status == 200) {
-              setReviews((prevRows) =>
+              setBookings((prevRows) =>
                 prevRows?.filter((r) => r.id != deleteId)
               );
               setTimeout(() => setDeleteId(null), 5000);
             }
             return res.status == 200
-              ? "Successfully deleted the review"
-              : "Error deleted the review";
+              ? "Successfully deleted the booking"
+              : "Error deleted the booking";
           }}
         >
-          Are you sure you want to delete this review?
+          Are you sure you want to delete this booking?
         </ModalConfirm>
       )}
     </>
