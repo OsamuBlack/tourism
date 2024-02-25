@@ -43,9 +43,10 @@ const authOptions: AuthOptions = {
             if (valid && user.role == "admin") return user;
             return null;
           } else if (user) {
+            console.log(user)
             const password = await bcrypt.hash(credentials.password, 10);
-            const res = addUser(user, password);
-            return null;
+            const res = await addUser(user, password);
+            return user;
           }
           return null;
         }

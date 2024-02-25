@@ -28,15 +28,7 @@ export default function RootLayout({
           rubik.variable + " " + rubik.className + " " + plafair.variable
         }
       >
-        <ThemeProvider theme={MuiTheme}>
-          <CssBaseline />
-          <Header />
-          {children}
-        </ThemeProvider>
-        <Script
-          strategy="lazyOnload"
-          src={`https://embed.tawk.to/${process.env.PROPERTYID}/${process.env.WIDGETID}`}
-        />
+        {children}
       </body>
     </html>
   );

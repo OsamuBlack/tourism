@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
 
   let users;
-  const session = await getServerSession(authOptions);
-  if (session) {
+  // const session = await getServerSession(authOptions);
+  // if (session) {
     try {
       users = await getUsers();
       return NextResponse.json({
@@ -25,12 +25,13 @@ export async function GET(request: NextRequest) {
         status: 500,
       });
     }
-  } else {
-    return NextResponse.json({
-      users: null,
-      status: 401,
-    });
-  }
+  // }
+  //  else {
+  //   return NextResponse.json({
+  //     users: null,
+  //     status: 401,
+  //   });
+  // }
 }
 
 export async function POST(request: NextRequest) {
